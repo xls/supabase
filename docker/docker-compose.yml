@@ -299,7 +299,7 @@ services:
     image: supabase/postgres-meta:v0.93.1
     restart: unless-stopped
     depends_on:
-      -db
+      - db
       - analytics
     environment:
       PG_META_PORT: 8080
