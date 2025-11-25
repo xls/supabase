@@ -25,8 +25,7 @@ services:
       interval: 5s
       retries: 3
     depends_on:
-      analytics:
-        condition: service_healthy
+      - analytics
     environment:
       # Binds nestjs listener to both IPv4 and IPv6 network interfaces
       HOSTNAME: "::"
@@ -71,8 +70,7 @@ services:
       # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
     depends_on:
-      analytics:
-        condition: service_healthy
+      - analytics
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
@@ -106,11 +104,8 @@ services:
       interval: 5s
       retries: 3
     depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      analytics:
-        condition: service_healthy
+      - db
+      - analytics
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
@@ -176,11 +171,8 @@ services:
     image: postgrest/postgrest:v13.0.7
     restart: unless-stopped
     depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      analytics:
-        condition: service_healthy
+      - db
+      - analytics
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -200,11 +192,8 @@ services:
     image: supabase/realtime:v2.63.0
     restart: unless-stopped
     depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      analytics:
-        condition: service_healthy
+      - db
+      - analytics
     healthcheck:
       test:
         [
@@ -261,8 +250,7 @@ services:
       retries: 3
     depends_on:
       db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
+        condition: service_started
       rest:
         condition: service_started
       imgproxy:
@@ -311,11 +299,8 @@ services:
     image: supabase/postgres-meta:v0.93.1
     restart: unless-stopped
     depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      analytics:
-        condition: service_healthy
+      -db
+      - analytics
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
@@ -332,8 +317,7 @@ services:
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
     depends_on:
-      analytics:
-        condition: service_healthy
+      - analytics
     environment:
       JWT_SECRET: ${JWT_SECRET}
       SUPABASE_URL: http://kong:8000
@@ -372,9 +356,7 @@ services:
       interval: 5s
       retries: 10
     depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
+      - db
     environment:
       LOGFLARE_NODE_HOST: 127.0.0.1
       DB_USERNAME: supabase_admin
@@ -433,8 +415,7 @@ services:
       timeout: 5s
       retries: 10
     depends_on:
-      vector:
-        condition: service_healthy
+      - vector
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
@@ -509,10 +490,8 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
-      db:
-        condition: service_healthy
-      analytics:
-        condition: service_healthy
+      - db
+      - analytics
     environment:
       PORT: 4000
       POSTGRES_PORT: ${POSTGRES_PORT}
